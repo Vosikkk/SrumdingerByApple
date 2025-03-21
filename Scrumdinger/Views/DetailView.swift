@@ -9,6 +9,8 @@ import SwiftUI
 
 struct DetailView: View {
     
+    @State private var isPresentingEditView: Bool = false
+    
     let scrum: DailyScrum
     
     var body: some View {
@@ -16,10 +18,12 @@ struct DetailView: View {
         List {
             
             Section("Meeting Info") {
-                
-                Label("Start Meeting", systemImage: "timer")
-                    .font(.headline)
-                    .foregroundStyle(Color.accentColor)
+                NavigationLink(destination: MeetingView()) {
+    
+                    Label("Start Meeting", systemImage: "timer")
+                        .font(.headline)
+                        .foregroundStyle(Color.accentColor)
+                }
                 
                 HStack {
                     
@@ -53,6 +57,33 @@ struct DetailView: View {
                    
                     Label(attendee.name, systemImage: "person")
                 }
+            }
+        }
+        .navigationTitle(scrum.title)
+        .toolbar {
+            Button("Edit") {
+                isPresentingEditView = true
+            }
+        }
+        .sheet(isPresented: $isPresentingEditView) {
+            
+            NavigationStack {
+                
+                DetailEditView()
+                    .navigationTitle(scrum.title)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Cancel") {
+                                isPresentingEditView = false
+                            }
+                        }
+                        
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Done") {
+                                isPresentingEditView = false
+                            }
+                        }
+                    }
             }
         }
     }
