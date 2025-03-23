@@ -9,9 +9,13 @@ import SwiftUI
 
 struct ScrumsView: View {
     
+    @Environment(\.scenePhase) private var scenePhase
+    
     @Binding var scrums: [DailyScrum]
     
     @State private var isPresentingNewScrumView: Bool = false
+    
+    let saveAction: () -> Void
     
     var body: some View {
         
@@ -41,9 +45,12 @@ struct ScrumsView: View {
                 isPresentingNewScrumView: $isPresentingNewScrumView
             )
         }
+        .onChange(of: scenePhase) { _, newValue in
+            if newValue == .inactive { saveAction() } 
+        }
     }
 }
 
 #Preview {
-    ScrumsView(scrums: .constant(DailyScrum.sampleData))
+    ScrumsView(scrums: .constant(DailyScrum.sampleData), saveAction: {})
 }
