@@ -8,55 +8,58 @@
 import SwiftUI
 
 struct MeetingView: View {
+    
+    @State var scrumTimer: ScrumTimer = .init()
+    
+    @Binding var scrum: DailyScrum
    
     var body: some View {
         
-        VStack {
+        ZStack {
+           
+            RoundedRectangle(cornerRadius: 16.0)
+                .fill(scrum.theme.mainColor)
             
-            ProgressView(value: 5, total: 15)
-            
-            HStack {
+            VStack {
+                MeetingHeaderView(
+                    secondsElapsed: scrumTimer.secondsElapsed,
+                    secondsRemaning: scrumTimer.secondsRemaining,
+                    theme: scrum.theme
+                )
                 
-                VStack(alignment: .leading) {
+                
+                Circle()
+                    .strokeBorder(lineWidth: 24)
+                
+                HStack {
                     
-                    Text("Seconds Elapsed")
-                        .font(.caption)
+                    Text("Speaker 1 / 3")
                     
-                    Label("300", systemImage: "hourglass.tophalf.fill")
-                }
-                
-                Spacer()
-                
-                VStack(alignment: .trailing) {
+                    Spacer()
                     
-                    Text("Seconds Remaining")
-                        .font(.caption)
-                    Label("600", systemImage: "hourglass.bottomhalf.fill")
+                    Button(action: {}) {
+                        Image(systemName: "forward.fill")
+                    }
+                    .accessibilityLabel("Next speaker")
                 }
-            }
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel("Time remaining")
-            .accessibilityValue("10 minutes")
-            
-            Circle()
-                .strokeBorder(lineWidth: 24)
-            
-            HStack {
-                
-                Text("Speaker 1 / 3")
-                
-                Spacer()
-                
-                Button(action: {}) {
-                    Image(systemName: "forward.fill")
-                }
-                .accessibilityLabel("Next speaker")
             }
         }
         .padding()
+        .foregroundStyle(scrum.theme.accentColor)
+        .onAppear {
+            scrumTimer.reset(
+                lengthInMunites: scrum.lengthInMinutes,
+                attendees: scrum.attendees
+            )
+            scrumTimer.startScrum()
+        }
+        .onDisappear {
+            scrumTimer.stopScrum()
+        }
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 #Preview {
-    MeetingView()
+    MeetingView(scrum: .constant(DailyScrum.sampleData[0]))
 }
